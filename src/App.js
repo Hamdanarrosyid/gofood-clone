@@ -12,6 +12,7 @@ import {
   Route,
 } from "react-router-dom";
 import Home from './pages/Home';
+import Login from './pages/Login';
 
 const client = new ApolloClient({
   uri: 'https://dev-krby0u.microgen.id/graphql',
@@ -25,6 +26,7 @@ function App() {
       <Router>
         <Switch>
           <Route path="/" exact component={Home}/>
+          <Route path="/login" component={Login}/>
         </Switch>
       </Router>
     </ApolloProvider>

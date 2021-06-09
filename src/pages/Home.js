@@ -10,6 +10,7 @@ const Home = () => {
             </div>
             <div className="grid flex-wrap gap-4 grid-cols-2">
                 <Card name={'Sego Goreng'} price={'20000'} merchant={'pundong food'}/>
+                <Card name={'Sego Goreng'} price={'20000'} merchant={'pundong food'}/>
             </div>
         </Container>
     )
