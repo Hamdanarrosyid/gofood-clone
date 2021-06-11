@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import Container from '../components/layouts/container'
+import Container from '../components/layouts/Container'
 import TextInput from '../components/TextInput'
 import Cookie from 'js-cookie'
 import Button from '../components/Button'
@@ -32,7 +32,6 @@ const Login = () => {
         login({ variables: { input: loginState } })
             .then(res => {
                 const {token} = res.data.login
-                console.log(res)
                 Cookie.set('token',token)
                 history.push('/')
             })
