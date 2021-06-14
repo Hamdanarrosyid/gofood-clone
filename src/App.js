@@ -17,11 +17,11 @@ import {
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Map from './pages/Map';
+import ViewFood from './pages/ViewFood';
 import Cookies from 'js-cookie';
 import { setContext } from '@apollo/client/link/context'
 import { getMainDefinition } from '@apollo/client/utilities';
 import { WebSocketLink } from '@apollo/client/link/ws';
-import ViewFood from './pages/ViewFood';
 
 const wsLink = new WebSocketLink({
   uri: 'ws://https://dev-krby0u.microgen.id/graphql',

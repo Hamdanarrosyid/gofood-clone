@@ -29,11 +29,11 @@ const Home = () => {
     const {loading,data,error} = useQuery(queryFood)
     const history  = useHistory()
 
-    if(loading){
-        return <Loading/>
+    if (loading) {
+        return <Loading />
     }
-    if(error){
-        return <Error/>
+    if (error) {
+        return <Error />
     }
     return (
         <Container role={'customer'}>
