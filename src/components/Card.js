@@ -1,9 +1,9 @@
 import React from 'react'
 
 const Card = (props) => {
-    const { name, merchant, price, image } = props
+    const { name, merchant, price, image,onClick } = props
     return (
-        <div className={'shadow-lg h-52 cursor-pointer md:h-80 flex flex-col rounded-lg overflow-hidden'}>
+        <div onClick={onClick} className={'shadow-lg h-52 cursor-pointer md:h-80 flex flex-col rounded-lg overflow-hidden'}>
             <div className="w-full h-3/5">
                 <img className="w-full h-full" src={image} alt={name} />
             </div>

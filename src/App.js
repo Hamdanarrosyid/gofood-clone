@@ -12,14 +12,16 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
+  Redirect
 } from "react-router-dom";
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Map from './pages/Map';
 import Cookies from 'js-cookie';
-import {setContext} from '@apollo/client/link/context'
+import { setContext } from '@apollo/client/link/context'
 import { getMainDefinition } from '@apollo/client/utilities';
 import { WebSocketLink } from '@apollo/client/link/ws';
+import ViewFood from './pages/ViewFood';
 
 const wsLink = new WebSocketLink({
   uri: 'ws://https://dev-krby0u.microgen.id/graphql',
@@ -32,16 +34,16 @@ const wsLink = new WebSocketLink({
 });
 
 const httpLink = createHttpLink({
-  uri:'https://dev-krby0u.microgen.id/graphql'
+  uri: 'https://dev-krby0u.microgen.id/graphql'
 })
 
-const authLink = setContext((_,{headers})=>{
+const authLink = setContext((_, { headers }) => {
   const token = Cookies.get('token')
-  return{
-      headers:{
-          ...headers,
-          authorization:token? `Bearer ${token}`:''
-      }
+  return {
+    headers: {
+      ...headers,
+      authorization: token ? `Bearer ${token}` : ''
+    }
   }
 })
 
@@ -57,9 +59,9 @@ const splitLink = split(
   authLink.concat(httpLink),
 );
 
- const client = new ApolloClient({
-  link:splitLink,
-  cache:new InMemoryCache()
+const client = new ApolloClient({
+  link: splitLink,
+  cache: new InMemoryCache()
 })
 
 
@@ -68,30 +70,48 @@ function App() {
     <ApolloProvider client={client}>
       <Router>
         <Switch>
-          <Route path="/" exact component={Home}/>
-          <Route path="/login" component={Login}/>
-          <Route path="/map" component={Map}/>
+          <AuthRoute exact path={'/'} children={<Home />} />
+          <Route path={'/food/:id'} children={<ViewFood/>}/>
+          <AuthRoute path={'/map'} children={<Map />} />
+          <GuestRoute path={'/login'} children={<Login />} />
+          <Route path={'*'} component={NotFound} />
         </Switch>
       </Router>
     </ApolloProvider>
   );
 }
 
-export default App;
+const AuthRoute = ({ children, ...rest }) => {
+  return (
+    <Route {...rest}
+      render={props => Cookies.get('token') ? (
+        children
+      ) : (
+        <Redirect to={{ pathname: '/login', state: { from: props.location } }} />
+      )}
+    />
+  )
+}
+/**
+ * @description GuestRoute adalah Route Component yang harus tidak memerlukan akses login
+ * @param authRoute berisi props default Route Component
+ * @returns Route component
+ */
+const GuestRoute = ({ children, ...rest }) => {
+  return (
+    <Route {...rest}
+      render={props => Cookies.get('token') ? (
+        <Redirect to={{ pathname: '/', state: { from: props.location } }} />
+      ) : (
+        children
+      )}
+    />
+  )
+}
 
-{/* <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div> */}
+const NotFound = () => {
+  return (
+    <h1 style={{color:'white'}}>Not Found</h1>
+  )
+}
+export default App;

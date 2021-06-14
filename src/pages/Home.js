@@ -4,6 +4,7 @@ import Card from '../components/Card'
 import Container from '../components/layouts/Container'
 import Loading from '../components/layouts/Loading'
 import Error from '../components/layouts/Error'
+import { useHistory } from 'react-router-dom'
 
 const queryFood = gql`
 query{
@@ -16,7 +17,7 @@ query{
           firstName
         }
       }
-      quantity
+      stock
       price
       image
       id
@@ -26,6 +27,7 @@ query{
 
 const Home = () => {
     const {loading,data,error} = useQuery(queryFood)
+    const history  = useHistory()
 
     if(loading){
         return <Loading/>
@@ -41,7 +43,7 @@ const Home = () => {
                 </div>
                 <div className="grid flex-wrap gap-4 grid-cols-2">
                     {data.foods.map((value)=>(
-                        <Card image={value.image} name={value.name} price={value.price} merchant={value.merchant.name} key={value.id}/>
+                        <Card onClick={()=>history.push(`food/${value.id}`)} image={value.image} name={value.name} price={value.price} merchant={value.merchant.name} key={value.id}/>
                     ))}                    
                 </div>
             </div>
