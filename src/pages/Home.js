@@ -5,15 +5,20 @@ import Container from '../components/layouts/Container'
 import Loading from '../components/layouts/Loading'
 import Error from '../components/layouts/Error'
 import { useHistory } from 'react-router-dom'
+import Map from '../pages/Map';
 
 const queryFood = gql`
-query{
-    foods{
+query {
+    user {
+      id
+      role
+    }
+    foods {
       name
-      merchant{
+      merchant {
         name
         id
-        owner{
+        owner {
           firstName
         }
       }
@@ -23,10 +28,11 @@ query{
       id
     }
   }
+  
 `
 
 const Home = () => {
-    const {loading,data,error} = useQuery(queryFood)
+    const {loading,data,error} = useQuery(queryFood,{ fetchPolicy: 'network-only' })
     const history  = useHistory()
 
     if (loading) {
@@ -35,11 +41,16 @@ const Home = () => {
     if (error) {
         return <Error />
     }
+
+    const {user} = data
     return (
-        <Container role={'customer'}>
+        <Container padding={user.role !== 'DRIVER'} role={user.role}>
+            {user.role == 'DRIVER'?(
+                <Map/>
+            ):user.role == 'CUSTOMER'?(
             <div>
                 <div className="py-2">
-                    <h1>Foodies</h1>
+                    <h1 className={"font-bold text-green-700 text-xl"}>Foodies</h1>
                 </div>
                 <div className="grid flex-wrap gap-4 grid-cols-2">
                     {data.foods.map((value)=>(
@@ -47,6 +58,10 @@ const Home = () => {
                     ))}                    
                 </div>
             </div>
+                
+            ):(
+                <p>Merchant Page</p>
+            )}
         </Container>
     )
 }

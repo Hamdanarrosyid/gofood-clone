@@ -1,5 +1,17 @@
+import { gql, useMutation } from '@apollo/client'
+import Cookies from 'js-cookie'
 import React from 'react'
 import { useHistory } from 'react-router-dom'
+import Loading from './Loading'
+import Error from './Error'
+
+const mutationLogout = gql`
+mutation($token:String!){
+    logout(input:{token:$token}){
+      id
+    }
+  }
+`
 
 const BottomButton = (props) => {
     return (
@@ -9,23 +21,45 @@ const BottomButton = (props) => {
 
 const Container = (props) => {
     const history = useHistory()
-    const { role, padding = true, back, onBack,bottom } = props
+    const [logout,{loading,error}] = useMutation(mutationLogout)
+    const { role, padding = true, back, onBack, bottom } = props
     const menus = {
-        'driver': [{ title: "Map", path: '/map' }],
-        'customer': [{ title: "Home", path: '/' }],
-        'admin': [{ title: "Home", path: '/' }],
+        'DRIVER': [{ title: "Map", path: '/map' }],
+        'CUSTOMER': [{ title: "Home", path: '/' }],
+        'MERCHANT': [{ title: "Home", path: '/' }],
         '': []
+    }
+
+    const onLogout = () => {
+        logout({variables:{token:Cookies.get('token')}}).then(res=>{
+            Cookies.remove('token')
+            history.push('/login')
+        }).catch(err=>{
+            console.log(err)
+        })
     }
 
     const selectedRoleMenu = menus[role ?? '']
 
+    if (loading) {
+        return <Loading />
+    }
+    if (error) {
+        return <Error />
+    }
+
     return (
         <div className={'w-screen h-screen overflow-hidden pb-14'}>
-            <div className={`md:w-1/2 m-auto w-full p-5 bg-green-700 flex items-center ${onBack ? 'justify-between' : 'justify-center'}`}>
+            <div className={`md:w-1/2 m-auto w-full p-5 bg-green-700 flex items-center justify-between`}>
                 {onBack && (
                     <p onClick={onBack} className={'font-bold cursor-pointer text-white text-xl'}>&#x2190; Back</p>
                 )}
                 <h1 className="font-bold text-white text-xl">GoPESSS </h1>
+                {Cookies.get('token') && (
+                    <div>
+                        <p onClick={onLogout} className={'font-bold cursor-pointer text-white text-xl'}>&#x8594; Keluar</p>
+                    </div>
+                )}
             </div>
             <div className={`md:w-1/2 w-full h-full bg-white m-auto ${padding ? 'p-5' : ''} overflow-y-scroll`}>
                 {props.children}

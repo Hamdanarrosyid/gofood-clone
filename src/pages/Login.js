@@ -5,6 +5,8 @@ import Cookie from 'js-cookie'
 import Button from '../components/Button'
 import { gql, useMutation } from '@apollo/client'
 import { useHistory } from 'react-router-dom'
+import Loading from '../components/layouts/Loading'
+import Error from '../components/layouts/Error'
 
 
 const loginMutation = gql`
@@ -18,7 +20,7 @@ mutation($input:LoginInput){
 const Login = () => {
     const history = useHistory()
     const [loginState, setLoginState] = useState({ email: '', password: '' })
-    const [login] = useMutation(loginMutation)
+    const [login, { loading, error }] = useMutation(loginMutation)
 
     const handleChange = (e) => {
         setLoginState({
@@ -31,8 +33,8 @@ const Login = () => {
         e.preventDefault()
         login({ variables: { input: loginState } })
             .then(res => {
-                const {token} = res.data.login
-                Cookie.set('token',token)
+                const { token } = res.data.login
+                Cookie.set('token', token)
                 history.push('/')
             })
             .catch(err => {
@@ -40,17 +42,24 @@ const Login = () => {
             })
     }
 
+
     return (
         <Container>
             <div className={'flex h-full items-center'}>
-                <form action={'#'} method={'post'} className={'w-full bg-gray-500 p-5 rounded-lg'}>
-                    <div className={'w-full flex justify-center py-5'}>
-                        <h1 className={'font-bold text-white text-2xl'}>Loginsss</h1>
-                    </div>
-                    <TextInput autocomplete={'email'} value={loginState.email} onChange={handleChange} name={'email'} type={'email'} placeholder={'johndoe@example.com'} label={'Email'} />
-                    <TextInput value={loginState.password} onChange={handleChange} name={'password'} type={'password'} placeholder={'********'} label={'Password'} />
-                    <Button title={'Submit'} type={'Submit'} onClick={handleSubmit} />
-                </form>
+                {loading ? (
+                    <Loading/>
+                ) : error ? (
+                    <Error/>
+                ) : (
+                    <form action={'#'} method={'post'} className={'w-full bg-gray-500 p-5 rounded-lg'}>
+                        <div className={'w-full flex justify-center py-5'}>
+                            <h1 className={'font-bold text-white text-2xl'}>Login</h1>
+                        </div>
+                        <TextInput autocomplete={'email'} value={loginState.email} onChange={handleChange} name={'email'} type={'email'} placeholder={'johndoe@example.com'} label={'Email'} />
+                        <TextInput value={loginState.password} onChange={handleChange} name={'password'} type={'password'} placeholder={'********'} label={'Password'} />
+                        <Button title={'Submit'} type={'Submit'} onClick={handleSubmit} />
+                    </form>
+                )}
             </div>
         </Container>
     )

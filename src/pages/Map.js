@@ -35,7 +35,7 @@ const Map = () => {
     }
     const {address} = data.user.driver.theDriver
     return (
-        <Container padding={false} role={'driver'}>
+        // <Container padding={false} role={'driver'}>
                 <MapContainer center={[address.latitude, address.longitude]} scrollWheelZoom={false} zoom={18} className={'h-full'} scrollWheelZoom={false}>
                     <TileLayer
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -46,7 +46,7 @@ const Map = () => {
                         </Popup>
                     </Marker>
                 </MapContainer>
-        </Container>
+        // </Container>
     )
 }
 

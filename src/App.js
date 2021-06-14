@@ -71,8 +71,8 @@ function App() {
       <Router>
         <Switch>
           <AuthRoute exact path={'/'} children={<Home />} />
-          <Route path={'/food/:id'} children={<ViewFood/>}/>
-          <AuthRoute path={'/map'} children={<Map />} />
+          <AuthRoute path={'/food/:id'} children={<ViewFood/>}/>
+          {/* <AuthRoute path={'/map'} children={<Map />} /> */}
           <GuestRoute path={'/login'} children={<Login />} />
           <Route path={'*'} component={NotFound} />
         </Switch>
