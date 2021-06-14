@@ -16,8 +16,9 @@ import {
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Map from './pages/Map';
+import ViewFood from './pages/viewfood';
 import Cookies from 'js-cookie';
-import {setContext} from '@apollo/client/link/context'
+import { setContext } from '@apollo/client/link/context'
 import { getMainDefinition } from '@apollo/client/utilities';
 import { WebSocketLink } from '@apollo/client/link/ws';
 
@@ -32,16 +33,16 @@ const wsLink = new WebSocketLink({
 });
 
 const httpLink = createHttpLink({
-  uri:'https://dev-krby0u.microgen.id/graphql'
+  uri: 'https://dev-krby0u.microgen.id/graphql'
 })
 
-const authLink = setContext((_,{headers})=>{
+const authLink = setContext((_, { headers }) => {
   const token = Cookies.get('token')
-  return{
-      headers:{
-          ...headers,
-          authorization:token? `Bearer ${token}`:''
-      }
+  return {
+    headers: {
+      ...headers,
+      authorization: token ? `Bearer ${token}` : ''
+    }
   }
 })
 
@@ -57,9 +58,9 @@ const splitLink = split(
   authLink.concat(httpLink),
 );
 
- const client = new ApolloClient({
-  link:splitLink,
-  cache:new InMemoryCache()
+const client = new ApolloClient({
+  link: splitLink,
+  cache: new InMemoryCache()
 })
 
 
@@ -68,9 +69,10 @@ function App() {
     <ApolloProvider client={client}>
       <Router>
         <Switch>
-          <Route path="/" exact component={Home}/>
-          <Route path="/login" component={Login}/>
-          <Route path="/map" component={Map}/>
+          <Route path="/" exact component={Home} />
+          <Route path="/login" component={Login} />
+          <Route path="/map" component={Map} />
+          <Route path="/viewfood" component={ViewFood} />
         </Switch>
       </Router>
     </ApolloProvider>

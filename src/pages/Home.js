@@ -25,13 +25,13 @@ query{
 `
 
 const Home = () => {
-    const {loading,data,error} = useQuery(queryFood)
+    const { loading, data, error } = useQuery(queryFood)
 
-    if(loading){
-        return <Loading/>
+    if (loading) {
+        return <Loading />
     }
-    if(error){
-        return <Error/>
+    if (error) {
+        return <Error />
     }
     return (
         <Container role={'customer'}>
@@ -40,9 +40,9 @@ const Home = () => {
                     <h1>Foodies</h1>
                 </div>
                 <div className="grid flex-wrap gap-4 grid-cols-2">
-                    {data.foods.map((value)=>(
-                        <Card image={value.image} name={value.name} price={value.price} merchant={value.merchant.name} key={value.id}/>
-                    ))}                    
+                    {data.foods.map((value) => (
+                        <Card image={value.image} name={value.name} price={value.price} merchant={value.merchant.name} key={value.id} />
+                    ))}
                 </div>
             </div>
         </Container>
