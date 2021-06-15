@@ -16,7 +16,6 @@ import {
 } from "react-router-dom";
 import Home from './pages/Home';
 import Login from './pages/Login';
-import Map from './pages/Map';
 import ViewFood from './pages/ViewFood';
 import Cookies from 'js-cookie';
 import { setContext } from '@apollo/client/link/context'

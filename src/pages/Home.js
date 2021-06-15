@@ -6,6 +6,7 @@ import Loading from '../components/layouts/Loading'
 import Error from '../components/layouts/Error'
 import { useHistory } from 'react-router-dom'
 import Map from '../pages/Map';
+import Merchant from './Merchant'
 
 const queryFood = gql`
 query {
@@ -60,7 +61,7 @@ const Home = () => {
             </div>
                 
             ):(
-                <p>Merchant Page</p>
+                <Merchant user={user}/>
             )}
         </Container>
     )
