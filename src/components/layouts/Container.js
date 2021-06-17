@@ -22,7 +22,7 @@ const BottomButton = (props) => {
 const Container = (props) => {
     const history = useHistory()
     const [logout,{loading,error}] = useMutation(mutationLogout)
-    const { role, padding = true, back, onBack, bottom } = props
+    const { role, padding = true, onBack, bottom } = props
     const menus = {
         'DRIVER': [{ title: "Map", path: '/map' }],
         'CUSTOMER': [{ title: "Home", path: '/' }],

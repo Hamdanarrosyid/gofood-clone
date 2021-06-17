@@ -6,7 +6,8 @@ import {
   InMemoryCache,
   ApolloProvider,
   createHttpLink,
-  split
+  split,
+  HttpLink
 } from "@apollo/client";
 import {
   BrowserRouter as Router,
@@ -20,14 +21,14 @@ import ViewFood from './pages/ViewFood';
 import Cookies from 'js-cookie';
 import { setContext } from '@apollo/client/link/context'
 import { getMainDefinition } from '@apollo/client/utilities';
-import { WebSocketLink } from '@apollo/client/link/ws';
+import { WebSocketLink } from 'apollo-link-ws';
 
 const wsLink = new WebSocketLink({
-  uri: 'ws://https://dev-krby0u.microgen.id/graphql',
+  uri: 'wss://dev-krby0u.microgen.id/graphql',
   options: {
     reconnect: true,
     connectionParams: {
-      authToken: Cookies.get('token')
+        Authorization: Cookies.get('token') ? `Bearer ${Cookies.get('token')}` : '',
     },
   },
 });
@@ -54,7 +55,7 @@ const splitLink = split(
       definition.operation === 'subscription'
     );
   },
-  wsLink,
+  authLink.concat(wsLink),
   authLink.concat(httpLink),
 );
 
