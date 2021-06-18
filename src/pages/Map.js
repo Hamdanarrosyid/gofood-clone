@@ -89,14 +89,14 @@ const Map = () => {
 
     if (!subs.loading && !subs.error) {
       helpArray.push(subs.data.orderUpdated)
-      setQueue(helpArray)
+      setQueue(helpArray.map(value=>value))
       setModal(true)
       console.log(queue)
     }
     return () => {
       setQueue([])
     };
-  }, [subs.data?.orderUpdated?.id,subs.loading,queue.length]);
+  }, [subs.data?.orderUpdated?.id,subs.loading]);
 
   if (loading && subs.loading) {
     return <Loading />
