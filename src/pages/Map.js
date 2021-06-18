@@ -60,48 +60,37 @@ subscription{
 
 const Map = () => {
   const { loading, error, data } = useQuery(queryUser)
-  const subs = useSubscription(subsOrder,{fetchPolicy:'network-only'})
+  const {loading:subsLoading,error:subsError,data:subsData} = useSubscription(subsOrder, { fetchPolicy: 'network-only' })
   const [modal, setModal] = useState(false)
   const [destination, setDestination] = useState(null)
   const [queue, setQueue] = useState([])
-  const [zoom, setZoom] = useState(14)
-
-  const handleReject = (id) => {
-    console.log(id)
-    const helpArray = queue
-    // const result = helpArray.filter(value => value.id !== id)
-    const getOne = queue.map((value) => value.id).indexOf(id)
-    helpArray.splice(getOne,1)
-    setQueue(helpArray.map(e=>e))
-    // console.log(result, helpArray)
-  }
 
   const handlePickUp = (address) => {
     // console.log(address)
-    setDestination({lat:address.latitude,long:address.longitude})
+    setDestination({ lat: address.latitude, long: address.longitude })
     setModal(false)
     setQueue([])
   }
 
   useEffect(() => {
-    const helpArray = queue
-    console.log('data : ',subs.data)
-
-    if (!subs.loading && !subs.error) {
-      helpArray.push(subs.data.orderUpdated)
-      setQueue(helpArray.map(value=>value))
-      setModal(true)
-      console.log(queue)
+    const storeData = () => {
+      const helpArray = queue
+      if (!subsLoading && !subsError) {
+        helpArray.push(subsData?.orderUpdated)
+        setQueue(helpArray.map(value => value))
+        setModal(true)
+      }
     }
+    storeData()
     return () => {
       setQueue([])
     };
-  }, [subs.data?.orderUpdated?.id,subs.loading]);
+  }, [subsData?.orderUpdated, subsLoading,subsError]);
 
-  if (loading && subs.loading) {
+  if (loading && subsLoading) {
     return <Loading />
   }
-  if (error && subs.error) {
+  if (error && subsError) {
     return <Error />
   }
   const { address } = data.user.driver.theDriver
@@ -144,7 +133,7 @@ const Map = () => {
           }
         </div>
       )}
-      <MapContainer center={[parseFloat(address.latitude), parseFloat(address.longitude)]} scrollWheelZoom={false} zoom={zoom} className={'h-full z-0'} scrollWheelZoom={false}>
+      <MapContainer center={[parseFloat(address.latitude), parseFloat(address.longitude)]} zoom={14} className={'h-full z-0'} scrollWheelZoom={false}>
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />

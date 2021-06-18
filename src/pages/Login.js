@@ -55,7 +55,7 @@ const Login = () => {
                         <div className={'w-full flex justify-center py-5'}>
                             <h1 className={'font-bold text-white text-2xl'}>Login</h1>
                         </div>
-                        <TextInput autocomplete={'email'} value={loginState.email} onChange={handleChange} name={'email'} type={'email'} placeholder={'johndoe@example.com'} label={'Email'} />
+                        <TextInput autoComplete={'email'} value={loginState.email} onChange={handleChange} name={'email'} type={'email'} placeholder={'johndoe@example.com'} label={'Email'} />
                         <TextInput value={loginState.password} onChange={handleChange} name={'password'} type={'password'} placeholder={'********'} label={'Password'} />
                         <Button title={'Submit'} type={'Submit'} onClick={handleSubmit} />
                     </form>

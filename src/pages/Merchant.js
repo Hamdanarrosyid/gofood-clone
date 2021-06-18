@@ -76,21 +76,25 @@ const Merchant = ({ user }) => {
     }
 
     useEffect(() => {
-        if (!loading && !error) {
+        const storeData = () =>{
+            if (!loading && !error) {
+    
+                const pending = data.items.filter(value => value.order.status === 'PENDING')
+                const onProcess = data.items.filter(value => value.order.status === 'ON_PROCESS')
+                const readyPickup = data.items.filter(value => value.order.status === 'READY_PICKUP')
+    
+                setState({
+                    pending,
+                    onProcess,
+                    readyPickup
+                })
+            }
 
-            const pending = data.items.filter(value => value.order.status === 'PENDING')
-            const onProcess = data.items.filter(value => value.order.status === 'ON_PROCESS')
-            const readyPickup = data.items.filter(value => value.order.status === 'READY_PICKUP')
-
-            setState({
-                pending,
-                onProcess,
-                readyPickup
-            })
         }
+        storeData()
         return () => null
 
-    }, [loading,update.loading]);
+    }, [loading,update.loading,error,data?.items]);
 
     if (loading) {
         return <Loading />

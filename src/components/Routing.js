@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react'
-import { useLeafletContext, createControlComponent } from '@react-leaflet/core'
+import { createControlComponent } from '@react-leaflet/core'
 import Leaflet from 'leaflet'
 import "leaflet-routing-machine";
 

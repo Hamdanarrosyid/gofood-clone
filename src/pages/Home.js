@@ -41,13 +41,17 @@ const Home = () => {
 
 
     useEffect(() => {
-        if(state){
-            setStatus(state.status)
+        const setThisStatus = () =>{
+            if(state){
+                setStatus(state.status)
+            }
         }
+
+        setThisStatus()
         return () => {
            history.replace({state:''})
         };
-    }, []);
+    }, [history,state]);
 
     if (loading) {
         return <Loading />
