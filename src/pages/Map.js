@@ -66,7 +66,6 @@ const Map = () => {
   const [queue, setQueue] = useState([])
 
   const handlePickUp = (address) => {
-    // console.log(address)
     setDestination({ lat: address.latitude, long: address.longitude })
     setModal(false)
     setQueue([])
@@ -76,14 +75,16 @@ const Map = () => {
     const storeData = () => {
       const helpArray = queue
       if (!subsLoading && !subsError) {
-        helpArray.push(subsData?.orderUpdated)
-        setQueue(helpArray.map(value => value))
-        setModal(true)
+        if(subsData.orderUpdated){
+          helpArray.push(subsData.orderUpdated)
+          setQueue(helpArray.map(value=>value))
+          setModal(true)
+        }
       }
     }
     storeData()
     return () => {
-      setQueue([])
+      setQueue()
     };
   }, [subsData?.orderUpdated, subsLoading,subsError]);
 
@@ -97,7 +98,7 @@ const Map = () => {
 
   return (
     <React.Fragment>
-      {(queue.length > 0 && modal) && (
+      {(queue.length>0 && modal) && (
         <div className={'absolute z-20 top-0 flex md:m-auto justify-center flex-col bg-black bg-opacity-50 flex-wrap overflow-y-scroll h-screen md:w-1/2 w-screen'}>
           {
             queue.map((value) => (
