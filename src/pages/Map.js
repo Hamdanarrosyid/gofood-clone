@@ -60,7 +60,7 @@ subscription{
 
 const Map = () => {
   const { loading, error, data } = useQuery(queryUser)
-  const subs = useSubscription(subsOrder)
+  const subs = useSubscription(subsOrder,{fetchPolicy:'network-only'})
   const [modal, setModal] = useState(false)
   const [destination, setDestination] = useState(null)
   const [queue, setQueue] = useState([])
@@ -80,10 +80,13 @@ const Map = () => {
     // console.log(address)
     setDestination({lat:address.latitude,long:address.longitude})
     setModal(false)
+    setQueue([])
   }
 
   useEffect(() => {
     const helpArray = queue
+    console.log('data : ',subs.data)
+
     if (!subs.loading && !subs.error) {
       helpArray.push(subs.data.orderUpdated)
       setQueue(helpArray)
@@ -93,7 +96,7 @@ const Map = () => {
     return () => {
       setQueue([])
     };
-  }, [subs.data]);
+  }, [subs.data?.orderUpdated?.id,subs.loading,queue.length]);
 
   if (loading && subs.loading) {
     return <Loading />

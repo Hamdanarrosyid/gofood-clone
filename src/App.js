@@ -5,7 +5,6 @@ import {
   ApolloClient,
   InMemoryCache,
   ApolloProvider,
-  createHttpLink,
   split,
   HttpLink
 } from "@apollo/client";
@@ -27,13 +26,12 @@ const wsLink = new WebSocketLink({
   uri: 'wss://dev-krby0u.microgen.id/graphql',
   options: {
     reconnect: true,
-    connectionParams: {
-        Authorization: Cookies.get('token') ? `Bearer ${Cookies.get('token')}` : '',
-    },
+    lazy: true,
+    connectionParams: () =>({Authorization: Cookies.get('token') ? `Bearer ${Cookies.get('token')}` : ''})
   },
 });
 
-const httpLink = createHttpLink({
+const httpLink = new HttpLink({
   uri: 'https://dev-krby0u.microgen.id/graphql'
 })
 
@@ -55,12 +53,12 @@ const splitLink = split(
       definition.operation === 'subscription'
     );
   },
-  authLink.concat(wsLink),
-  authLink.concat(httpLink),
+  wsLink,
+  httpLink,
 );
 
 const client = new ApolloClient({
-  link: splitLink,
+  link: authLink.concat(splitLink),
   cache: new InMemoryCache()
 })
 
@@ -71,7 +69,7 @@ function App() {
       <Router>
         <Switch>
           <AuthRoute exact path={'/'} children={<Home />} />
-          <AuthRoute path={'/food/:id'} children={<ViewFood/>}/>
+          <AuthRoute path={'/food/:id'} children={<ViewFood />} />
           {/* <AuthRoute path={'/map'} children={<Map />} /> */}
           <GuestRoute path={'/login'} children={<Login />} />
           <Route path={'*'} component={NotFound} />
@@ -91,6 +89,8 @@ const AuthRoute = ({ children, ...rest }) => {
       )}
     />
   )
+
+
 }
 /**
  * @description GuestRoute adalah Route Component yang harus tidak memerlukan akses login
@@ -111,7 +111,7 @@ const GuestRoute = ({ children, ...rest }) => {
 
 const NotFound = () => {
   return (
-    <h1 style={{color:'white'}}>Not Found</h1>
+    <h1 style={{ color: 'white' }}>Not Found</h1>
   )
 }
 export default App;
