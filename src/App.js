@@ -21,6 +21,8 @@ import Cookies from 'js-cookie';
 import { setContext } from '@apollo/client/link/context'
 import { getMainDefinition } from '@apollo/client/utilities';
 import { WebSocketLink } from 'apollo-link-ws';
+import Register from './pages/Register';
+import PinLocation from './pages/PinLocation';
 
 const wsLink = new WebSocketLink({
   uri: 'wss://dev-krby0u.microgen.id/graphql',
@@ -70,7 +72,8 @@ function App() {
         <Switch>
           <AuthRoute exact path={'/'} children={<Home />} />
           <AuthRoute path={'/food/:id'} children={<ViewFood />} />
-          {/* <AuthRoute path={'/map'} children={<Map />} /> */}
+          <AuthRoute path={'/pin-location/:orderId'} children={<PinLocation/>} />
+          <GuestRoute path={'/register'} children={<Register />} />
           <GuestRoute path={'/login'} children={<Login />} />
           <Route path={'*'} component={NotFound} />
         </Switch>

@@ -67,7 +67,6 @@ const Merchant = ({ user }) => {
     const [changestatus,update] = useMutation(updateOrderStatus)
 
     const handleupdate = (id, status) => {
-        // console.log(id,status)
         changestatus({ variables: { id, status } })
             .then(res => res)
             .catch(err => {
@@ -77,8 +76,7 @@ const Merchant = ({ user }) => {
 
     useEffect(() => {
         const storeData = () =>{
-            if (!loading && !error) {
-    
+            if (!loading && !error) {    
                 const pending = data.items.filter(value => value.order.status === 'PENDING')
                 const onProcess = data.items.filter(value => value.order.status === 'ON_PROCESS')
                 const readyPickup = data.items.filter(value => value.order.status === 'READY_PICKUP')

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
-import { gql, useQuery, useSubscription } from '@apollo/client'
+import { gql, useMutation, useQuery, useSubscription } from '@apollo/client'
 import Loading from '../components/layouts/Loading'
 import Error from '../components/layouts/Error'
 import Button from '../components/Button'
-import RoutingMachine from '../components/Routing'
+import { RoutingMachine } from '../components/Routing'
 
 const queryUser = gql`
     query{
@@ -12,6 +12,7 @@ const queryUser = gql`
           id
           email
           driver{
+            id
             theDriver{
               id
               firstName
@@ -26,11 +27,36 @@ const queryUser = gql`
       }
     `
 
+const updateStatusOrder = gql`
+mutation($id: String!, $driverId: String!) {
+  updateOrder(
+    id: $id,
+    input: { status: DELIVERING, deliveredById: $driverId }
+  ) {
+    status
+  }
+}
+
+`
+
+const updateStatusDriver = gql`
+mutation($isFree:Boolean){
+  updateDriver(id:"60c0c1a0944ebb003d0acf72",input:{isFree:$isFree}){
+    isFree
+  }
+}
+`
+
 const subsOrder = gql`
 subscription{
   orderUpdated(where:{status:READY_PICKUP}){
     subtotal
     id
+    destination{
+      fullAddress
+      longitude
+      latitude
+    }
     merchant{
       name
       owner{
@@ -60,33 +86,76 @@ subscription{
 
 const Map = () => {
   const { loading, error, data } = useQuery(queryUser)
-  const {loading:subsLoading,error:subsError,data:subsData} = useSubscription(subsOrder, { fetchPolicy: 'network-only' })
+  const { loading: subsLoading, error: subsError, data: subsData } = useSubscription(subsOrder, { fetchPolicy: 'network-only' })
+  const [updateIsFree] = useMutation(updateStatusDriver)
+  const [updateStatusOrderDriver] = useMutation(updateStatusOrder)
   const [modal, setModal] = useState(false)
   const [destination, setDestination] = useState(null)
+  const [delivery, setDelivery] = useState(false)
+  const [toComplete, setToComplete] = useState(false)
   const [queue, setQueue] = useState([])
 
-  const handlePickUp = (address) => {
+  const handlePickUp = (id) => {
+    updateIsFree({ variables: { id, isFree: false } })
+      .then(res => {
+        setModal(false)
+        setDelivery(true)
+        setQueue([])
+      })
+      .catch(err => {
+        console.log(err)
+        setModal(false)
+        setQueue([])
+      })
+  }
+
+  const handleDelivery = (address, driverId,orderId) => {
+    setDelivery(false)
     setDestination({ lat: address.latitude, long: address.longitude })
-    setModal(false)
-    setQueue([])
+    setToComplete(true)
+
+    updateStatusOrderDriver({variables:{
+      id:orderId,
+      driverId
+    }})
+    .then(res =>{
+      console.log(res)
+    })
+    .catch(err => {
+      console.log(err)
+    })
+
+  }
+
+  const handelComplete = (id) => {
+    setDelivery(false)
+    setToComplete(false)
+    updateIsFree({ variables: { id, isFree: true } })
+      .then(res => {
+        setQueue([])
+      })
+      .catch(err => {
+        console.log(err)
+        setQueue([])
+      })
   }
 
   useEffect(() => {
     const storeData = () => {
       const helpArray = queue
       if (!subsLoading && !subsError) {
-        if(subsData.orderUpdated){
+        if (subsData.orderUpdated) {
           helpArray.push(subsData.orderUpdated)
-          setQueue(helpArray.map(value=>value))
+          setQueue(helpArray.map(value => value))
           setModal(true)
         }
       }
     }
     storeData()
     return () => {
-      setQueue()
+      setQueue([])
     };
-  }, [subsData?.orderUpdated, subsLoading,subsError]);
+  }, [subsData?.orderUpdated, subsLoading, subsError]);
 
   if (loading && subsLoading) {
     return <Loading />
@@ -98,7 +167,7 @@ const Map = () => {
 
   return (
     <React.Fragment>
-      {(queue.length>0 && modal) && (
+      {(queue.length > 0 && modal) && (
         <div className={'absolute z-20 top-0 flex md:m-auto justify-center flex-col bg-black bg-opacity-50 flex-wrap overflow-y-scroll h-screen md:w-1/2 w-screen'}>
           {
             queue.map((value) => (
@@ -118,12 +187,12 @@ const Map = () => {
                     </div>
                   </div>
                   <div className={'py-3'}>
-                    <p>Delivery to : <span className={'text-green-600'}>{value.createdBy.address.fullAddress}</span></p>
+                    <p>Delivery to : <span className={'text-green-600'}>{value.destination.fullAddress ?? 'Kosong'}</span></p>
                   </div>
                 </div>
                 <div className={'flex flex-1 w-full justify-between'}>
                   <div>
-                    <Button title={'Pick Up'} onClick={() => handlePickUp(value.merchant.owner.address)} />
+                    <Button title={'Pick Up'} onClick={() => handlePickUp(value.merchant.owner.address, data.user.driver.id)} />
                   </div>
                   {/* <div>
                     <Button title={'Reject'} color={'red'} onClick={() => handleReject(value.id)} />
@@ -134,6 +203,31 @@ const Map = () => {
           }
         </div>
       )}
+      {
+        delivery && (
+          <div className={'absolute z-20 bottom-3 flex md:m-auto justify-center flex-col  md:w-1/2 w-screen'}>
+            {/* <div className={'mx-10'}>
+              <Button onClick={()=>setDestination(null)} title={'Delete'} />
+            </div> */}
+            <div className={'mx-10'}>
+              <Button onClick={() => handleDelivery(subsData.orderUpdated.destination,data.user.driver.id,subsData.orderUpdated.id)} title={'Delivery to customer'} />
+            </div>
+          </div>
+        )
+      }
+      {
+        toComplete && (
+          <div className={'absolute z-20 bottom-3 flex md:m-auto justify-center flex-col  md:w-1/2 w-screen'}>
+            {/* <div className={'mx-10'}>
+              <Button onClick={()=>setDestination(null)} title={'Delete'} />
+            </div> */}
+            <div className={'mx-10'}>
+              <Button onClick={() => handelComplete(data.user.driver.id)} title={'Complete'} />
+            </div>
+          </div>
+        )
+      }
+
       <MapContainer center={[parseFloat(address.latitude), parseFloat(address.longitude)]} zoom={14} className={'h-full z-0'} scrollWheelZoom={false}>
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

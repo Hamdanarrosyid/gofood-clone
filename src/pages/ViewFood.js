@@ -1,25 +1,12 @@
-import { gql, useMutation, useQuery } from '@apollo/client'
+import { gql, useQuery } from '@apollo/client'
 import React, { useState } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
 import Container from '../components/layouts/Container'
 import Loading from '../components/layouts/Loading'
 import Error from '../components/layouts/Error'
 import Button from '../components/Button'
-
-const orderMutation = gql`
-mutation($foodId:String!,$qty:Int!){
-    createOrder(input:{items:{foodId:$foodId,quantity:$qty}}){
-      id
-      items{
-        id
-        food{
-          id
-          name
-        }
-      }
-    }
-  }
-`
+import useGeoLocation from '../utils/useGeoLocation'
+import Cookies from 'js-cookie'
 
 const getFoodQuery = gql`
 query($id:String!){
@@ -44,19 +31,37 @@ query($id:String!){
 const ViewFood = () => {
     const { id } = useParams()
     const history = useHistory()
+    const geoLocation = useGeoLocation()
     const { loading, error, data } = useQuery(getFoodQuery, { variables: { id } })
-    const [createOrder] = useMutation(orderMutation)
     const [quantity, setQuantity] = useState(1)
 
     const handleBuy = () => {
-        createOrder({ variables: { foodId: id, qty: quantity } })
-            .then(res => {
-                history.push({
-                    pathname: '/',
-                    state: { status: 'success' }
-                });
+        const address = {
+            fullAddress: '',
+            latitude: geoLocation.coordinates.lat,
+            longitude: geoLocation.coordinates.lng
+        }
+        const items = [
+            { foodId: id, quantity }
+        ]
+
+        fetch('https://dev-krby0u.microgen.id/function/create-order',
+            {
+                method: 'POST',
+                mode: 'cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${Cookies.get('token')}`
+                },
+                body: JSON.stringify({ address, order: { items } })
+            }
+        )
+            .then(res => res.json())
+            .then(data => {
+                history.push(`/pin-location/${data.createdOrder.id}`)
             })
             .catch(err => {
+                console.log(err)
                 history.push({
                     pathname: '/',
                     state: { status: 'error' }
@@ -103,7 +108,7 @@ const ViewFood = () => {
                 </div>
                 <div className={'flex-1 flex justify-end'}>
                     <div className={'w-1/2'}>
-                        <Button onClick={handleBuy} title={'Buy'} />
+                        <Button onClick={() => handleBuy()} title={'Buy'} />
                     </div>
                 </div>
             </div>
