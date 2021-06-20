@@ -57,7 +57,6 @@ const ViewFood = () => {
         )
             .then(res => res.json())
             .then(data => {
-                console.log(data)
                 history.push(`/pin-location/${data.createdOrder.id}`)
             })
             .finally(err => {
