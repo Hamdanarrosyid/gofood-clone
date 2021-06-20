@@ -59,7 +59,7 @@ const ViewFood = () => {
             .then(data => {
                 history.push(`/pin-location/${data.createdOrder.id}`)
             })
-            .finally(err => {
+            .catch(err => {
                 console.log(err)
                 history.push({
                     pathname: '/',
