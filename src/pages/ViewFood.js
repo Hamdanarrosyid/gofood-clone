@@ -60,13 +60,13 @@ const ViewFood = () => {
                 console.log(data)
                 history.push(`/pin-location/${data.createdOrder.id}`)
             })
-            // .finally(err => {
-            //     console.log(err)
-            //     history.push({
-            //         pathname: '/',
-            //         state: { status: 'error' }
-            //     });
-            // })
+            .finally(err => {
+                console.log(err)
+                history.push({
+                    pathname: '/',
+                    state: { status: 'error' }
+                });
+            })
     }
 
     if (loading) {
