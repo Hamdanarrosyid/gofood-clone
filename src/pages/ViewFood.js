@@ -48,7 +48,6 @@ const ViewFood = () => {
         fetch('https://dev-krby0u.microgen.id/function/create-order',
             {
                 method: 'POST',
-                mode: 'cors',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${Cookies.get('token')}`
